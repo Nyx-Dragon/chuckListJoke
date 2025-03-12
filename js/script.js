@@ -11,22 +11,27 @@ function fetchJoke() {
         const btnborrar = document.createElement("button");
         btnborrar.innerHTML = "Eliminar";
         btnborrar.style.background = "red";
-        btnborrar.addEventListener("click", () => {
-            valor.remove(); 
-            btnborrar.remove();
-            let jokes = JSON.parse(localStorage.getItem("chistes")) || [];
-            jokes = jokes.filter(joke => joke !== datos.value); // Eliminar el chiste del array
-            localStorage.setItem("chistes", JSON.stringify(jokes));
-        });
+        btnborrar.addEventListener("click", () => eliminarChiste(valor, datos.value));
 
         const container = document.getElementById("jokeList");
         container.appendChild(valor);
         valor.appendChild(btnborrar);
 
-        let jokes = JSON.parse(localStorage.getItem("chistes")) || [];
-        jokes.push(datos.value);
-        localStorage.setItem("chistes", JSON.stringify(jokes));
+        almacenarChiste(datos.value);
     });
+}
+
+function almacenarChiste(chiste) {
+    let jokes = JSON.parse(localStorage.getItem("chistes")) || [];
+    jokes.push(chiste);
+    localStorage.setItem("chistes", JSON.stringify(jokes));
+}
+
+function eliminarChiste(element, chiste) {
+    element.remove();
+    let jokes = JSON.parse(localStorage.getItem("chistes")) || [];
+    jokes = jokes.filter(joke => joke !== chiste);
+    localStorage.setItem("chistes", JSON.stringify(jokes));
 }
 
 boton.addEventListener("click", fetchJoke);
