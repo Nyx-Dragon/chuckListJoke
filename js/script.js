@@ -2,8 +2,10 @@ const boton = document.getElementById("fetchJoke");
 
 function fetchJoke() {
     fetch('https://api.chucknorris.io/jokes/random', {})
-    .then(respuesta => respuesta.json())
-    .then(datos => {
+    .then(function(respuesta) {
+        return respuesta.json();
+    })
+    .then(function(datos) {
         console.log(datos);
         const valor = document.createElement("li");
         valor.innerHTML = datos.value;
@@ -11,7 +13,9 @@ function fetchJoke() {
         const btnborrar = document.createElement("button");
         btnborrar.innerHTML = "Eliminar";
         btnborrar.style.background = "red";
-        btnborrar.addEventListener("click", () => eliminarChiste(valor, datos.value));
+        btnborrar.addEventListener("click", function() {
+            eliminarChiste(valor, datos.value);
+        });
 
         const container = document.getElementById("jokeList");
         container.appendChild(valor);
@@ -30,7 +34,9 @@ function almacenarChiste(chiste) {
 function eliminarChiste(element, chiste) {
     element.remove();
     let jokes = JSON.parse(localStorage.getItem("chistes")) || [];
-    jokes = jokes.filter(joke => joke !== chiste);
+    jokes = jokes.filter(function(joke) {
+        return joke !== chiste;
+    });
     localStorage.setItem("chistes", JSON.stringify(jokes));
 }
 
