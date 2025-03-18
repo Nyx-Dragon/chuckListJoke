@@ -1,0 +1,128 @@
+📌 Paso 1: Obtener un chiste de la API de Chuck Norris
+javascript
+Copiar
+Editar
+function fetchJoke() {
+    fetch('https://api.chucknorris.io/jokes/random', {})
+    .then(function(respuesta) {
+        return respuesta.json();
+    })
+    .then(function(datos) {
+        console.log(datos);
+        // Crear el chiste y mostrarlo en la página
+    });
+}
+🔹 ¿Qué ocurre aquí?
+
+Usamos fetch() para hacer una solicitud a la API de Chuck Norris.
+Cuando obtenemos la respuesta, la convertimos a formato JSON con .then(res => res.json()).
+En el segundo .then(), trabajamos con los datos obtenidos, que contienen el chiste.
+📌 Paso 2: Mostrar el chiste en la página
+javascript
+Copiar
+Editar
+const valor = document.createElement("li");
+valor.innerHTML = datos.value;
+🔹 ¿Qué ocurre aquí?
+
+Creamos un nuevo elemento li (lista) donde pondremos el chiste.
+Asignamos el contenido del chiste obtenido (datos.value) a ese li.
+📌 Paso 3: Crear un botón "Eliminar"
+javascript
+Copiar
+Editar
+const btnborrar = document.createElement("button");
+btnborrar.innerHTML = "Eliminar";
+btnborrar.style.background = "red";
+🔹 ¿Qué ocurre aquí?
+
+Creamos un botón con el texto "Eliminar" y lo estilizamos con un fondo rojo.
+📌 Paso 4: Función para eliminar el chiste
+javascript
+Copiar
+Editar
+function eliminarHandler() {
+    eliminarChiste(valor, datos.value);
+}
+🔹 ¿Qué ocurre aquí?
+
+Creamos una función eliminarHandler() que llama a eliminarChiste(), la cual eliminará el chiste tanto de la página como de localStorage.
+📌 Paso 5: Añadir el botón de "Eliminar" y el chiste a la lista
+javascript
+Copiar
+Editar
+const container = document.getElementById("jokeList");
+container.appendChild(valor);
+valor.appendChild(btnborrar);
+🔹 ¿Qué ocurre aquí?
+
+Añadimos el li con el chiste y el botón "Eliminar" a un contenedor (jokeList) en la página.
+📌 Paso 6: Almacenar el chiste en localStorage
+javascript
+Copiar
+Editar
+function almacenarChiste(chiste) {
+    let jokes = JSON.parse(localStorage.getItem("chistes")) || [];
+    jokes.push(chiste);
+    localStorage.setItem("chistes", JSON.stringify(jokes));
+}
+🔹 ¿Qué ocurre aquí?
+
+Primero, obtenemos los chistes guardados en localStorage (si los hay) y los almacenamos en un array.
+Luego, añadimos el nuevo chiste al array y lo volvemos a guardar en localStorage.
+📌 Paso 7: Eliminar un chiste de la página y localStorage
+javascript
+Copiar
+Editar
+function eliminarChiste(element, chiste) {
+    element.remove();
+    let jokes = JSON.parse(localStorage.getItem("chistes")) || [];
+    jokes = jokes.filter(function(joke) {
+        return joke !== chiste;
+    });
+    localStorage.setItem("chistes", JSON.stringify(jokes));
+}
+🔹 ¿Qué ocurre aquí?
+
+Eliminamos el chiste de la página con element.remove().
+Luego, filtramos el array de chistes guardados en localStorage para eliminar el chiste que ya fue borrado y lo actualizamos.
+📌 Paso 8: Mostrar los chistes almacenados en localStorage al cargar la página
+javascript
+Copiar
+Editar
+function mostrarChistes() {
+    let jokes = JSON.parse(localStorage.getItem("chistes")) || [];
+    jokes.forEach(function(chiste) {
+        const valor = document.createElement("li");
+        valor.innerHTML = chiste;
+        const btnborrar = document.createElement("button");
+        btnborrar.innerHTML = "Eliminar";
+        btnborrar.style.background = "red";
+        btnborrar.addEventListener("click", function() {
+            eliminarChiste(valor, chiste);
+        });
+        const container = document.getElementById("jokeList");
+        container.appendChild(valor);
+        valor.appendChild(btnborrar);
+    });
+}
+🔹 ¿Qué ocurre aquí?
+
+Cuando la página se carga, obtenemos los chistes almacenados en localStorage.
+Luego, por cada chiste, creamos un li con el chiste y un botón "Eliminar" asociado, que permite borrar ese chiste.
+📌 Paso 9: Conectar el botón para obtener chistes
+javascript
+Copiar
+Editar
+boton.addEventListener("click", fetchJoke);
+🔹 ¿Qué ocurre aquí?
+
+Cuando el usuario hace clic en el botón "Obtener chiste", se ejecuta la función fetchJoke(), que obtiene un nuevo chiste de la API.
+📌 Paso 10: Mostrar los chistes almacenados al cargar la página
+javascript
+Copiar
+Editar
+document.addEventListener("DOMContentLoaded", mostrarChistes);
+🔹 ¿Qué ocurre aquí?
+
+Cuando la página se carga (DOMContentLoaded), se ejecuta la función mostrarChistes() para mostrar todos los chistes almacenados en localStorage.
