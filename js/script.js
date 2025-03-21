@@ -2,7 +2,7 @@
 const boton = document.getElementById("fetchJoke");
 
 // Función que obtiene un chiste de la API de Chuck Norris y lo muestra en la página
-let chartInstance; // Variable to store the chart instance
+let chartInstance = null; // Variable para almacenar la instancia
 
 function fetchJoke() {
     fetch('https://api.chucknorris.io/jokes/random', {})
@@ -12,7 +12,7 @@ function fetchJoke() {
         .then(function (datos) {
             console.log(datos);
 
-            // Destroy the existing chart if it exists
+            // Destruimos chart si existe
             if (chartInstance) {
                 chartInstance.destroy();
             }
@@ -29,7 +29,7 @@ function fetchJoke() {
                 }]
             };
 
-            // Create a new chart instance and store it
+            // Creamos una nueva instancia y la sobreescibimos
             chartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: datosChiste,
