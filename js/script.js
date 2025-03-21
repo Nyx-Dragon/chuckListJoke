@@ -3,105 +3,104 @@ const boton = document.getElementById("fetchJoke");
 
 // Función que obtiene un chiste de la API de Chuck Norris y lo muestra en la página
 function fetchJoke() {
-    // Hace una solicitud fetch a la API de chistes de Chuck Norris
     fetch('https://api.chucknorris.io/jokes/random', {})
-    .then(function(respuesta) {
-        // Convierte la respuesta a formato JSON
-        return respuesta.json();
-    })
-    .then(function(datos) {
-        // Muestra los datos en la consola
-        console.log(datos);
-        
-        // Crea un nuevo elemento de lista (li) y le asigna el chiste obtenido
-        const valor = document.createElement("li");
-        valor.innerHTML = datos.value;
+        .then(function (respuesta) {
+            return respuesta.json();
+        })
+        .then(function (datos) {
+            console.log(datos);
 
-        // Crea un botón "Eliminar" y le asigna estilo y funcionalidad
-        const btnborrar = document.createElement("button");
-        btnborrar.innerHTML = "Eliminar";
-        btnborrar.style.background = "red";
+            // Actualiza el gráfico con la longitud del chiste
+            const ctx = document.getElementById('miGrafico').getContext('2d');
+            const datosChiste = {
+                labels: ['Longitud'],
+                datasets: [{
+                    label: 'Longitud de los chistes',
+                    data: [datos.value.length],
+                    backgroundColor: 'rgba(54, 162, 235, 0.3)',
+                    borderColor: 'rgba(54, 162, 235, 0.9)',
+                    borderWidth: 2,
+                }]
+            };
 
-        // Define la función para manejar el evento de clic
-        function eliminarHandler() {
-            eliminarChiste(valor, datos.value);
-        }
+            new Chart(ctx, {
+                type: 'bar',
+                data: datosChiste,
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: { // Adjusted scale key for bar charts
+                            beginAtZero: true,
+                        },
+                        y: { // Adjusted scale key for bar charts
+                            beginAtZero: true,
+                        }
+                    }
+                }
+            });
 
-        // Añade el evento 'click' a btnborrar con la función eliminada separada
-        btnborrar.addEventListener("click", eliminarHandler);
+            // Crea un nuevo elemento de lista con el chiste
+            const valor = document.createElement("li");
+            valor.innerHTML = datos.value;
 
-        // Añade el chiste y el botón a la lista de chistes en la página
-        const container = document.getElementById("jokeList");
-        container.appendChild(valor);
-        valor.appendChild(btnborrar);
+            // Botón "Eliminar"
+            const btnborrar = document.createElement("button");
+            btnborrar.innerHTML = "Eliminar";
+            btnborrar.style.background = "red";
 
-        // Almacena el chiste en localStorage
-        almacenarChiste(datos.value);
-    });
+            btnborrar.addEventListener("click", function () {
+                eliminarChiste(valor, datos.value);
+            });
+
+            const container = document.getElementById("jokeList");
+            container.appendChild(valor);
+            valor.appendChild(btnborrar);
+
+            almacenarChiste(datos.value);
+        });
 }
 
-// Función que maneja el evento de clic para eliminar un chiste
-function eliminarHandler(valor, chiste) {
-    eliminarChiste(valor, chiste);
-}
-
-// Función que almacena un chiste en localStorage
+// Función para almacenar un chiste
 function almacenarChiste(chiste) {
-    // Obtiene los chistes almacenados en localStorage o crea un array vacío si no hay ninguno
     let jokes = JSON.parse(localStorage.getItem("chistes")) || [];
-    // Añade el nuevo chiste al array
     jokes.push(chiste);
-    // Guarda el array actualizado en localStorage
     localStorage.setItem("chistes", JSON.stringify(jokes));
 }
 
-// Función que elimina un chiste de la página y de localStorage
+// Función para eliminar un chiste
 function eliminarChiste(element, chiste) {
-    // Elimina el elemento de la lista de la página
     element.remove();
-    // Obtiene los chistes almacenados en localStorage
     let jokes = JSON.parse(localStorage.getItem("chistes")) || [];
-    // Elimina el chiste específico del array
-    jokes = jokes.filter(function(joke) {
+    jokes = jokes.filter(function (joke) {
         return joke !== chiste;
     });
-    // Guarda el array actualizado en localStorage
     localStorage.setItem("chistes", JSON.stringify(jokes));
 }
 
-// Función que muestra los chistes almacenados al cargar la página
+// Mostrar chistes almacenados al cargar
 function mostrarChistes() {
     let jokes = JSON.parse(localStorage.getItem("chistes")) || [];
-    jokes.forEach(function(chiste) {
-        // Crea un nuevo elemento de lista (li) y le asigna el chiste almacenado
+    jokes.forEach(function (chiste) {
         const valor = document.createElement("li");
         valor.innerHTML = chiste;
 
-        // Crea un botón "Eliminar" y le asigna estilo y funcionalidad
         const btnborrar = document.createElement("button");
         btnborrar.innerHTML = "Eliminar";
         btnborrar.style.background = "red";
 
-        // Define la función para manejar el evento de clic
-        function eliminarHandler() {
+        btnborrar.addEventListener("click", function () {
             eliminarChiste(valor, chiste);
-        }
+        });
 
-        // Añade el evento 'click' a btnborrar con la función eliminada separada
-        btnborrar.addEventListener("click", eliminarHandler);
-
-        // Añade el chiste y el botón a la lista de chistes en la página
         const container = document.getElementById("jokeList");
         container.appendChild(valor);
         valor.appendChild(btnborrar);
     });
 }
 
-// Añade un event listener al botón para ejecutar fetchJoke cuando se hace clic en él
 boton.addEventListener("click", fetchJoke);
-
-// Muestra los chistes almacenados al cargar la página
 document.addEventListener("DOMContentLoaded", mostrarChistes);
+
 
 //El signo || hacer la funcion de (OR)
 
