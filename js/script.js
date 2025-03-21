@@ -2,7 +2,7 @@
 const boton = document.getElementById("fetchJoke");
 
 // Función que obtiene un chiste de la API de Chuck Norris y lo muestra en la página
-let chartInstance = null; // Variable para almacenar la instancia
+let chartInstance = null; // Variable para almacenar la instancia, null hace que no se queje si eliminamos el chart
 
 function fetchJoke() {
     fetch('https://api.chucknorris.io/jokes/random', {})
@@ -41,6 +41,7 @@ function fetchJoke() {
                         },
                         y: {
                             beginAtZero: true,
+                            max:100,
                         }
                     }
                 }
