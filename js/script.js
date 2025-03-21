@@ -2,6 +2,8 @@
 const boton = document.getElementById("fetchJoke");
 
 // Función que obtiene un chiste de la API de Chuck Norris y lo muestra en la página
+let chartInstance; // Variable to store the chart instance
+
 function fetchJoke() {
     fetch('https://api.chucknorris.io/jokes/random', {})
         .then(function (respuesta) {
@@ -10,7 +12,11 @@ function fetchJoke() {
         .then(function (datos) {
             console.log(datos);
 
-            // Actualiza el gráfico con la longitud del chiste
+            // Destroy the existing chart if it exists
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
             const ctx = document.getElementById('miGrafico').getContext('2d');
             const datosChiste = {
                 labels: ['Longitud'],
@@ -23,27 +29,26 @@ function fetchJoke() {
                 }]
             };
 
-            new Chart(ctx, {
+            // Create a new chart instance and store it
+            chartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: datosChiste,
                 options: {
                     responsive: true,
                     scales: {
-                        x: { // Adjusted scale key for bar charts
+                        x: {
                             beginAtZero: true,
                         },
-                        y: { // Adjusted scale key for bar charts
+                        y: {
                             beginAtZero: true,
                         }
                     }
                 }
             });
 
-            // Crea un nuevo elemento de lista con el chiste
             const valor = document.createElement("li");
             valor.innerHTML = datos.value;
 
-            // Botón "Eliminar"
             const btnborrar = document.createElement("button");
             btnborrar.innerHTML = "Eliminar";
             btnborrar.style.background = "red";
@@ -100,7 +105,6 @@ function mostrarChistes() {
 
 boton.addEventListener("click", fetchJoke);
 document.addEventListener("DOMContentLoaded", mostrarChistes);
-
 
 //El signo || hacer la funcion de (OR)
 
