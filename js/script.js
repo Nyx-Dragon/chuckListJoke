@@ -1,161 +1,123 @@
-// Obtiene el elemento del botón con el id "fetchJoke"
-const boton = document.getElementById("fetchJoke");
+//Función para pintar la cajita del chiste junto con el boton
+//Función para pintar los gráficos
+const button = document.getElementById("fetchJoke");
+const borrar = document.getElementById("deleteJoke")
+const lista = document.getElementById("jokeList");
+let grafico = null; //Variable para almacenar la instancia, null hace que no se queje si eliminamos el chart.
+function storage(){
+    //Destruye la gráfica si existe, se recomienda el let de este valor desde fuera
+    //de la función porque el let para llamar a la función del if con el mismo nombre
+    if (grafico){
+        grafico.destroy();
+    }
+}
+function chiste(){
+    fetch (`https://api.chucknorris.io/jokes/random`)
+    .then((response) => response.json())
+    .then((data) => {
+        console.log(data);
+    //Los valores tienen que tener nombres descriptivos.
+    const valorchiste = document.createElement("p");
+    const creabuttonchiste = document.createElement("button");
+    creabuttonchiste.setAttribute("id", data.id);
+    valorchiste.setAttribute("id", "valor");
+    valorchiste.innerHTML = data.value;
+    creabuttonchiste.innerHTML = "Eliminar";
+    creabuttonchiste.style.background = "Red";
+    const container = document.getElementById("jokeList");
+    container.appendChild(valorchiste);
+    container.appendChild(creabuttonchiste);
 
-// Función que obtiene un chiste de la API de Chuck Norris y lo muestra en la página
-let chartInstance = null; // Variable para almacenar la instancia, null hace que no se queje si eliminamos el chart
+    //Gráfica
+        //Destruye la gráfica si existe, se recomienda el let de este valor desde fuera
+        //de la función porque el let para llamar a la función del if con el mismo nombre
+    storage();
 
-function fetchJoke() {
-    fetch('https://api.chucknorris.io/jokes/random', {})
-        .then(function (respuesta) {
-            return respuesta.json();
-        })
-        .then(function (datos) {
-            console.log(datos);
+    //Local Storage
+    //Se tiene que crear una variable de array para poder meter los datos.
+    //Si hay un error de "Unexpected Token", eso quiere decir que ha habido un valor
+    //fuera de JSON, hay que ir a Application y eliminarlo.
+    //cargarChistes(data.value);
+    let array = JSON.parse(localStorage.getItem("Chiste")) || [];
+    array.push({joke: data.value, id: data.id});
+    localStorage.setItem("Chiste", JSON.stringify(array));
 
-            // Destruimos chart si existe
-            if (chartInstance) {
-                chartInstance.destroy();
-            }
+    //Esos dos valores, labels y lengths junto con array.map sirven para recorrer el array y meter las gráficas con los
+    //chistes actuales que hay en el LocalStorage.
+    labels = array.map(chiste => chiste.id);
+    lengths = array.map(chiste => chiste.joke.length);
+    
+    const canva = document.getElementById("GraficoChiste").getContext('2d');
 
-            const ctx = document.getElementById('miGrafico').getContext('2d');
-            const datosChiste = {
-                labels: ['Longitud'],
-                datasets: [{
-                    label: 'Longitud de los chistes',
-                    data: [datos.value.length],
-                    backgroundColor: 'rgba(54, 162, 235, 0.3)',
-                    borderColor: 'rgba(54, 162, 235, 0.9)',
-                    borderWidth: 2,
-                }]
-            };
+    const datos = {
+        labels: labels,
+        datasets: [{
+            label: 'Longitud de los chistes',
+            data: lengths,
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            borderColor: 'rgba(75, 192, 192, 1)',
+            borderWidth: 1
+        }]
+    }
 
-            // Creamos una nueva instancia y la sobreescibimos
-            chartInstance = new Chart(ctx, {
-                type: 'bar',
-                data: datosChiste,
-                options: {
-                    responsive: true,
-                    scales: {
-                        x: {
-                            beginAtZero: true,
-                        },
-                        y: {
-                            beginAtZero: true,
-                            max:100,
-                        }
-                    }
+    grafico = new Chart(canva, {
+        type: 'bar',
+        data: datos,
+        options: {
+            scales: {
+                x: {
+                    beginAtZero: true,
+                },
+                y: {
+                    beginAtZero: true,
+                    max: 100
                 }
-            });
-
-            const valor = document.createElement("li");
-            valor.innerHTML = datos.value;
-
-            const btnborrar = document.createElement("button");
-            btnborrar.innerHTML = "Eliminar";
-            btnborrar.style.background = "red";
-
-            btnborrar.addEventListener("click", function () {
-                eliminarChiste(valor, datos.value);
-            });
-
-            const container = document.getElementById("jokeList");
-            container.appendChild(valor);
-            valor.appendChild(btnborrar);
-
-            almacenarChiste(datos.value);
-        });
-}
-
-// Función para almacenar un chiste
-function almacenarChiste(chiste) {
-    let jokes = JSON.parse(localStorage.getItem("chistes")) || [];
-    jokes.push(chiste);
-    localStorage.setItem("chistes", JSON.stringify(jokes));
-}
-
-// Función para eliminar un chiste
-function eliminarChiste(element, chiste) {
-    element.remove();
-    let jokes = JSON.parse(localStorage.getItem("chistes")) || [];
-    jokes = jokes.filter(function (joke) {
-        return joke !== chiste;
+            }
+        }
     });
-    localStorage.setItem("chistes", JSON.stringify(jokes));
-}
 
-// Mostrar chistes almacenados al cargar
-function mostrarChistes() {
-    let jokes = JSON.parse(localStorage.getItem("chistes")) || [];
-    jokes.forEach(function (chiste) {
-        const valor = document.createElement("li");
-        valor.innerHTML = chiste;
-
-        const btnborrar = document.createElement("button");
-        btnborrar.innerHTML = "Eliminar";
-        btnborrar.style.background = "red";
-
-        btnborrar.addEventListener("click", function () {
-            eliminarChiste(valor, chiste);
-        });
-
-        const container = document.getElementById("jokeList");
-        container.appendChild(valor);
-        valor.appendChild(btnborrar);
-    });
-}
-
-boton.addEventListener("click", fetchJoke);
-document.addEventListener("DOMContentLoaded", mostrarChistes);
-
-//El signo || hacer la funcion de (OR)
-
-//Solucion Profe Nicolas
-
-/* const btnGetJoke = document.getElementById("fetchJoke");
- const jokeList = document.getElementById("jokeList");
- 
- let jokesArray = [];
- 
- const getJoke = () => {
-   fetch("https://api.chucknorris.io/jokes/random")
-     .then((res) => res.json())
-     .then((data) => {
-       jokesArray.push(data.value);
-       saveJokes();
-       displayJokes();
+    console.log(array);
+        //Evento para eliminar el valor array del chiste.
+    
+    creabuttonchiste.addEventListener("click", (event) => {
+        //Se tiene que recargar el array cuando se elimina un chiste.
+        let array = JSON.parse(localStorage.getItem("Chiste")) || [];
+        const idABorrar = event.target.id;
+        valorchiste.remove();
+        creabuttonchiste.remove();
+        //Ese for es para eliminar objetos en un array
+        const newArray = [];
+        for (let i = 0; i < array.length; i++) {
+            if(array[i].id !== idABorrar){
+                //console.log(array[i].id);
+                newArray.push(array[i]);
+            }
+        }
+        console.log(newArray);
+        localStorage.setItem("Chiste", JSON.stringify(newArray));
+        //array = newArray;
      });
- };
- 
- const displayJokes = () => {
-   jokeList.innerHTML = "";
-   jokesArray.forEach((joke, index) => {
-     jokeList.innerHTML += `
-         <div>
-         <p>${joke}</p>
-         <button class='redButton' onclick=deleteJoke(${index})>Eliminar</button>
-         </div>
-         `;
-   });
- };
- 
- const saveJokes = () => {
-   localStorage.setItem("jokes", JSON.stringify(jokesArray));
- };
- 
- const deleteJoke = (idToDelete) => {
-   // Filtrar aquellos elementos cuyo indice sea diferente al seleccionado a borrar
-   jokesArray = jokesArray.filter((_, index) => index != idToDelete);
-   saveJokes();
-   displayJokes();
- };
- 
- const loadJokes = () => {
-   if (localStorage.getItem("jokes")) {
-     const localJokes = JSON.parse(localStorage.getItem("jokes"));
-     jokesArray = localJokes;
-     displayJokes();
-   }
- };
- 
- btnGetJoke.addEventListener("click", getJoke);
- loadJokes(); */
+    })
+    
+}
+button.addEventListener("click", chiste);
+//document.addEventListener("DOMContentLoaded", chiste);
+
+//creabutton.addEventListener("click", () => eliminar);
+
+/*function cargarChistes(chiste){
+    let array = JSON.parse(localStorage.getItem("Chiste")) || [];
+    array.push(chiste);
+    localStorage.setItem("Chiste", JSON.stringify(array));
+
+}*/
+function borrartodo() {
+    localStorage.clear();
+    const jokeList = document.getElementById("jokeList");
+    while (jokeList.firstChild) {
+        jokeList.removeChild(jokeList.firstChild);
+    }
+    storage();
+}
+
+borrar.addEventListener("click", () => borrartodo());
